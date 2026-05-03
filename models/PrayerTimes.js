@@ -51,9 +51,16 @@ const prayerTimesSchema = new mongoose.Schema({
   }
 });
 
-// Compound index for faster searches and to prevent redundant data
-prayerTimesSchema.index({ city: 1, country: 1, date: 1, school: 1, method: 1, tune: 1 }, { unique: true });
-prayerTimesSchema.index({ latitude: 1, longitude: 1, date: 1, school: 1, method: 1, tune: 1 }, { unique: true });
+// Compound indexes with partialFilterExpression to avoid null value conflicts
+prayerTimesSchema.index(
+  { city: 1, country: 1, date: 1, school: 1, method: 1, tune: 1 },
+  { unique: true, partialFilterExpression: { city: { $exists: true, $ne: null } } }
+);
+
+prayerTimesSchema.index(
+  { latitude: 1, longitude: 1, date: 1, school: 1, method: 1, tune: 1 },
+  { unique: true, partialFilterExpression: { latitude: { $exists: true, $ne: null } } }
+);
 
 const PrayerTimes = mongoose.model('PrayerTimes', prayerTimesSchema);
 
