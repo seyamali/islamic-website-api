@@ -40,12 +40,13 @@ const getPrayerTimes = async (city, country, date, latitude, longitude, school, 
       throw new Error(`Failed to fetch from external API: ${response.data?.data || 'Unknown error'}`);
     }
 
-    const { timings, date: apiDate } = response.data.data;
+    const { timings, date: apiDate, meta } = response.data.data;
+    const detectedCity = meta.timezone?.split('/')[1]?.replace(/_/g, ' ') || 'Detected Location';
 
     // 3. Save to MongoDB
     const newPrayerTimes = new PrayerTimes({
-      city: city?.toLowerCase() || 'detected location',
-      country: country?.toLowerCase() || (lat && lon ? 'detected country' : 'bangladesh'),
+      city: city?.toLowerCase() || detectedCity.toLowerCase(),
+      country: country?.toLowerCase() || 'bangladesh',
       latitude: lat,
       longitude: lon,
       date,
